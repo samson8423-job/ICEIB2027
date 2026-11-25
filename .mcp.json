@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "overleaf": {
+      "type": "stdio",
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": [
+        "-y",
+        "overleaf-web-mcp",
+        "serve"
+      ]
+    }
+  }
+}
