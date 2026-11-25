@@ -1,0 +1,85 @@
+\section{Proposed Scheme}\label{sec:method}
+\subsection{Problem Formulation}
+Let a user session provide a natural-language request $u$, a user profile $p$ (preferences and allergens), a location or route context $c$, and a daily token budget $B_d$. The system must return a response $R$ consisting of text, cards, speech, and lip-synced video. The response must be produced only for in-scope requests, and the model usage of each session must remain within budget.
+
+Running metrics follow the standard definition:
+\begin{equation}
+\mathrm{Pace} = \frac{\mathrm{duration}\,(\mathrm{s})}{\mathrm{distance}\,(\mathrm{km})}.
+\label{eq:pace}
+\end{equation}
+Let $\tau_i$ denote the tokens consumed by the $i$-th model call within a day. The usage constraint is
+\begin{equation}
+\sum_{i=1}^{n}\tau_i \le B_d,
+\label{eq:budget}
+\end{equation}
+which is enforced by an atomic update before each call. Pauses are excluded from duration, and daily statistics use the user's local time zone.
+
+\subsection{System Architecture}
+Fig.~\ref{fig:architecture} shows eight numbered modules: (1) user scenario (mobile or desktop browser), (2) input processing (voice activity detection, speech-to-text, and text sanitization), (3) planning and reasoning (ScopeGuard and FitnessCoachAgent), (4) data acquisition (CWA weather API, Leaflet/Geoapify route data, and Supabase), (5) analytics (duration, pace, portion and calorie estimation, and token-budget accounting), (6) domain knowledge integration (MCP nutrition server and running safety rules), (7) decision and recommendation (run-plan drafts and meal-plan suggestions), and (8) output and interaction (web cards, text-to-speech, and digital-human lip sync).
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  mod/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, text width=3.6cm, minimum height=1.5cm, fill=blue!6, inner sep=3pt},
+  ext/.style={draw, dashed, rounded corners=2pt, align=center, font=\footnotesize, text width=5.4cm, minimum height=1cm, fill=gray!10, inner sep=3pt},
+  flow/.style={-{Stealth[length=2mm]}, thick},
+  link/.style={{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, dashed},
+]
+\node[mod] (m1) at (0,0) {\textbf{(1) User scenario}\\Mobile or desktop browser;\\Vercel CDN frontend};
+\node[mod] (m2) at (4.6,0) {\textbf{(2) Input processing}\\VAD / STT; text sanitization;\\FastAPI REST and WebSocket};
+\node[mod] (m3) at (9.2,0) {\textbf{(3) Planning and reasoning}\\ScopeGuard; FitnessCoachAgent\\(single bounded tool loop)};
+\node[mod] (m4) at (13.8,0) {\textbf{(4) Data acquisition}\\Tool Gateway; CWA weather;\\Leaflet / Geoapify routes};
+\node[mod] (m5) at (13.8,-3.2) {\textbf{(5) Analytics engine}\\Pace and duration; portion\\and calorie estimate; token budget};
+\node[mod] (m6) at (9.2,-3.2) {\textbf{(6) Domain knowledge}\\Nutrition MCP server;\\running safety rules};
+\node[mod] (m7) at (4.6,-3.2) {\textbf{(7) Decision and recommendation}\\Run-plan drafts;\\meal-plan suggestions};
+\node[mod] (m8) at (0,-3.2) {\textbf{(8) Output and interaction}\\Cards; text-to-speech;\\lip-synced digital human};
+\node[ext] (ext1) at (2.3,-6.2) {Model endpoints: LLM, STT, TTS, Vision (cloud HTTPS)};
+\node[ext] (ext2) at (11.5,-6.2) {Supabase Postgres and Storage};
+\draw[flow] (m1) -- (m2);
+\draw[flow] (m2) -- (m3);
+\draw[flow] (m3) -- (m4);
+\draw[flow] (m4) -- (m5);
+\draw[flow] (m5) -- (m6);
+\draw[flow] (m6) -- (m7);
+\draw[flow] (m7) -- (m8);
+\draw[link] (ext1.north) -- (m7.south);
+\draw[link] (ext2.north) -- (m6.south);
+\draw[link] (ext2.north) -- (m5.south);
+\end{tikzpicture}
+\caption{Overview of the proposed system architecture. Numbered modules follow the flow from user input (1) to output (8); dashed boxes are shared external services.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsection{Proposed Algorithm}
+The agent operates as a bounded tool loop. A request is first checked by ScopeGuard and the quota check, which do not involve the language model. Tool calls are limited to three iterations and six calls in total, with a 10\,s timeout per tool and a 45\,s budget for the whole reasoning turn. Every tool result is validated by the backend before it reaches the model or the user.
+
+\begin{algorithm}[t]
+\caption{FitnessCoachAgent Loop}
+\label{alg:agent}
+\begin{algorithmic}[1]
+\Require User request $u$, profile $p$, session $s$, budget $B_d$
+\Ensure Response $R$
+\If{not ScopeGuard.accept$(u)$}
+  \State \Return refusal message
+\EndIf
+\If{$\sum \tau(s) \ge B_d$}
+  \State \Return quota message
+\EndIf
+\State $T \gets$ BuildTaskSpec$(u, p, s)$
+\State $H \gets \emptyset$; $k \gets 0$; $t_0 \gets$ now
+\While{$k < 3$ \textbf{and} calls$(H) < 6$ \textbf{and} now $- t_0 < 45$\,s}
+  \State $a \gets$ LLM.next\_action$(T, H)$
+  \If{$a$ is final}
+    \State \textbf{break}
+  \EndIf
+  \State $r \gets$ ToolGateway.invoke$(a, \text{timeout} = 10\,\text{s})$
+  \State $r \gets$ BackendValidate$(r)$
+  \State $H \gets H \cup \{(a, r)\}$; charge tokens of this call atomically; $k \gets k + 1$
+\EndWhile
+\State $R \gets$ Render$(H)$ as text, cards, TTS, and lip-sync
+\State \Return $R$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Implementation}
+The frontend uses Vanilla JavaScript ES modules. The backend uses FastAPI deployed as Vercel Functions, with Supabase Postgres for persistent records. REST handles persistent business data, while WebSocket handles real-time dialogue and speech streaming. The digital-human lip-sync service runs independently of the main application. Following the design of CyborAgent and CyborAssistant, the voice and avatar components were consolidated into a single repository that extends the running-specific logic.

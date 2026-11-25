@@ -1,0 +1,23 @@
+\section{Experimental Results and Discussion}\label{sec:experiments}
+\subsection{Experimental Setup}
+The planned evaluation uses the deployed prototype on Vercel with Supabase, together with free-tier external services: CWA weather data, Leaflet/Geoapify map and route data, Gemini and Groq language and speech models, and Azure speech synthesis. A demonstration account and a set of manually verified campus and exhibition-area routes are used as test inputs. Hardware and software versions will be reported with the final measurements. The evaluation is not yet executed, so no data splits or sample sizes are reported here.
+
+\subsection{Baseline Methods and Evaluation Metrics}
+The planned comparison includes four reference systems: a form-based logging app, a text-only LLM chatbot, a voice assistant without a digital human, and a locally hosted GPU deployment. Metrics are of two kinds. Automated metrics are latency percentiles, token usage per session, and the rate of correctly refused out-of-scope requests. Human metrics are ratings of advice quality, route and weather correctness, and nutrition suggestions by evaluators who use the same scenarios.
+
+Table~\ref{tab:comparison} lists the capabilities reported in each reviewed source, together with the proposed system's design targets. It is qualitative and is not based on measurements.
+
+\subsection{Performance Comparison}
+The following latency targets are defined for the evaluation. They are design targets rather than observed values:
+\begin{itemize}
+\item General page load: P95 below 2\,s.
+\item Text input to first response segment: P95 below 8\,s.
+\item Voice input to audible response: P95 below 12\,s.
+\item Stop-playback response: below 300\,ms.
+\end{itemize}
+Measured results against these targets will be reported after the evaluation is completed.
+
+\input{tables/comparison}
+
+\subsection{Acceptance Scenarios and Ablation Plan}
+Functional verification uses 21 acceptance scenarios. They cover conversational advice, weather and route queries, manual activity logging, food calorie recognition, MCP nutrition menus, lip-sync output, rejection of unrelated requests, interruption during playback, data isolation between users, and reproducible cloud deployment. The planned ablation removes ScopeGuard and the token budget separately to measure their effect on out-of-scope handling and cost. Failure cases, uncertainty of food-image estimates, and limitations of the free-tier quotas will be analyzed with the results.

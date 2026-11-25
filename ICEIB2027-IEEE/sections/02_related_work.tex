@@ -1,0 +1,39 @@
+\section{Related Work}\label{sec:related}
+\subsection{Existing Approaches}
+We group the reviewed works by approach. Table~\ref{tab:summary} summarizes each work's problem, method, dataset, and findings as reported by its authors.
+
+\textit{Logging-based apps.} In an observational study of 22,142 users of a physical-activity program, users who combined a fitness tracker with app or web logging had the longest time before nonusage. The authors suggest that reducing the burden of manual logging may remove a barrier to continued use \cite{rayward2021}. The evidence is associational.
+
+\textit{Voice assistants.} In a 12-week feasibility trial, an Amazon Alexa device delivered home exercise sessions to 15 adults aged 60 to 89, and all participants completed the program. Participants reported voice-recognition errors and a lack of feedback as barriers \cite{jansons2022}. The sample is small.
+
+\textit{Pose and sensor analysis.} A single-smartphone pose-estimation system was compared with marker-based motion capture for running gait outcomes. The outcomes were accurate overall, but occlusion caused discrepancies for some measures \cite{young2023}. This work addresses gait measurement and does not address conversational planning.
+
+\textit{LLM agents with tool use.} GPTCoach follows an evidence-based coaching program, uses motivational interviewing, and uses a user's personal health data. It was evaluated with 16 participants as a technology probe \cite{jorke2024}. The evaluation is small and short-term.
+
+\textit{Real-time digital humans.} Recent streaming talking-head models report an end-to-end latency of about 0.17\,s on a single A10 GPU \cite{liu2025livatar}. These figures are self-reported and rely on dedicated GPU hardware. A live avatar that observes and grades exercise movement was demonstrated at NeurIPS 2019 \cite{memisevic2019millie}. We did not find a quantitative evaluation of that demonstration.
+
+\begin{table*}[t]
+\caption{Summary of the reviewed works, as reported by their authors.}
+\label{tab:summary}
+\centering
+\footnotesize
+\begin{tabular}{p{1.6cm}p{0.6cm}p{3.1cm}p{2.9cm}p{2.6cm}p{2.6cm}p{3.6cm}}
+\toprule
+Ref. & Year & Problem limitation & AI method & Domain knowledge & Dataset & Findings \\
+\midrule
+\cite{rayward2021} & 2021 & Manual logging burden; engagement drop-off & None (observational analysis of logs) & Physical activity (steps) & 22,142 users of the 10,000 Steps program & Users combining tracker and app/web logging had the longest time before nonusage (association) \\
+\cite{jansons2022} & 2022 & Voice recognition errors; lack of feedback & Voice assistant (Alexa) with physiologist-individualized program & Home exercise for older adults & 15 adults aged 60--89 & 15/15 completed; mean adherence 115\%; SUS 75/100; no related adverse events \\
+\cite{young2023} & 2023 & Occlusion; camera placement and viewpoint & Single-camera pose estimation (BlazePose) & Running gait & Smartphone recordings vs.\ Vicon motion capture & Gait outcomes accurate overall; discrepancies in some occluded outcomes \\
+\cite{jorke2024} & 2024 & Short-term evaluation; small sample & LLM with prompt chaining and tool use for health data & Physical activity coaching (Active Choices); motivational interviewing & 16-participant user study & Adheres to the coaching program with a supportive tone; sustained behavior change not shown \\
+\cite{kidman2024} & 2024 & Inconsistent definition of abandonment & None (scoping review) & Lifestyle and mental-health apps & 18 studies, 525,824 participants & Median 70\% discontinued within 100 days; faster abandonment for alcohol and smoking apps \\
+\cite{liu2025livatar} & 2025 & Latency--quality trade-off & Flow-matching streaming talking-head generation & General talking heads & Benchmark on HDTF (LipSync Confidence) & Self-reported end-to-end latency of 0.17\,s on one A10 GPU \\
+\cite{memisevic2019millie} & 2019 & No quantitative evaluation found for the demonstration & Audio-visual neural network (3D convolutions) & Fitness form grading & Not reported in the demonstration abstract & Live avatar grades speed, accuracy, and form (demonstration only) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Scope and Design Trade-offs}
+This work limits its domain scope to pace and duration, route and weather context, and nutrition suggestions. Physiological guidance such as heart-rate zones and injury prevention is outside the evaluated scope. The design involves three trade-offs. The first is a single agent with a bounded tool loop instead of multiple agents or open-ended tool use. The second is text and voice input with a digital human as an output option, rather than a digital human as the primary interface. The third is manual logging with optional device data, rather than continuous high-precision GPS tracking.
+
+\subsection{Research Gap}
+Table~\ref{tab:comparison} compares the reviewed systems on the capabilities reported in their sources. None of the reviewed works reports all of conversational input, personal data, environmental context, an embodied interface, and deployment on free-tier cloud infrastructure. The proposed system targets this combination, and its free-tier deployment is a design target that remains to be verified.

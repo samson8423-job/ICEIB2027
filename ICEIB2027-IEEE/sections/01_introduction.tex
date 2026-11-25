@@ -1,0 +1,18 @@
+\section{Introduction}\label{sec:intro}
+\subsection{Background and Motivation}
+Insufficient physical activity is a major public-health problem. According to the World Health Organization, nearly one third of adults, about 1.8 billion people, did not meet recommended activity levels in 2022 \cite{who2024news}, and insufficient activity is associated with a 20--30\% higher risk of death \cite{who_pa}. In Taiwan, 35.6\% of residents aged 13 and over reported regular exercise, defined as at least three sessions of 30 minutes per week, in the 2025 national sports survey \cite{pts2025}. Digital health apps are one response to this problem, but adherence is limited: in a scoping review of 18 studies of lifestyle and mental-health apps, a median of 70\% of users discontinued use within the first 100 days \cite{kidman2024}. This figure covers mixed behavior-change apps rather than fitness apps alone.
+
+\subsection{Problem Statement and Research Gap}
+We identify three limitations in the reviewed works. First, logging-based apps depend on manual entry, and an observational study of step logging found that users who combined a tracker with app or web logging stayed in the program longest \cite{rayward2021}. Second, none of the works summarized in Table~\ref{tab:summary} reports using environmental context, such as weather or route conditions, when planning a session. Third, conversational assistants and digital humans add latency and compute requirements \cite{liu2025livatar}. The reviewed systems were evaluated on dedicated hardware or in small trials, so their feasibility on free-tier infrastructure is not established. The research question is whether a single conversational agent with explicit scope and budget control can integrate these capabilities into a publicly deployable running coach.
+
+\subsection{Research Contributions}
+The main contributions of this work are as follows:
+\begin{itemize}
+\item \textbf{Conversation-first coaching.} We propose a running coach whose only entry point is natural language (text or voice), so that users can request a plan without filling in forms.
+\item \textbf{Single-agent architecture with explicit control.} We combine one FitnessCoachAgent with a non-LLM ScopeGuard for intent filtering and a per-day token budget, avoiding multi-agent complexity and uncontrolled model cost.
+\item \textbf{Domain integration.} We connect weather, route, activity records, food-image estimation, and MCP-based nutrition suggestions to the agent through a typed tool interface with backend validation.
+\item \textbf{Planned evaluation protocol.} We define an end-to-end evaluation plan with explicit latency targets and 21 acceptance scenarios. Results are not reported in this paper.
+\end{itemize}
+
+\subsection{Paper Organization}
+Section~\ref{sec:related} reviews related work. Section~\ref{sec:method} presents the proposed scheme. Section~\ref{sec:experiments} describes the evaluation, and Section~\ref{sec:conclusion} concludes the paper.
