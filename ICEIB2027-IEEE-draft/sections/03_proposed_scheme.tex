@@ -1,0 +1,15 @@
+\section{Proposed Scheme}\label{sec:method}
+% PA--PM: aim, foundations, design, components, flow, example, verification.
+\subsection{System Sketch}
+We plan to combine the voice and tool loop from CyborAgent with the lip-sync interface from CyborAssistant. The browser would use Vanilla JavaScript, with FastAPI handling requests and Supabase storing activity records. REST would handle persistent data, and WebSocket would handle live dialogue. Lip sync would run separately.
+
+Text or transcribed speech would first reach ScopeGuard for a non-LLM intent and daily quota check. FitnessCoachAgent would then request weather, routes, and activity records as needed. Food photos would produce portion and calorie estimates. An MCP nutrition tool would use preferences and allergens when suggesting meals. The backend would validate tool results before rendering text, cards, speech, or a lip-synced avatar.
+
+% TODO: Draw the numbered architecture figure, write line-numbered
+% pseudocode, and define how tool failures and timeouts are handled.
+
+\subsection{Example Flow}
+For a request to run for 30 minutes today, the coach would check local weather and routes, then offer a draft plan. The runner would confirm before a session starts and enter the distance afterward. For positive distances, pace in seconds per kilometer is active duration in seconds divided by distance in kilometers. Paused time is excluded.
+
+% TODO: Specify run-state transitions, local-day reporting, and how token
+% reservations are reconciled when model calls succeed or fail.

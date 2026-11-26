@@ -1,0 +1,9 @@
+\section{Evaluation Plan}\label{sec:experiments}
+We plan to test a demo account, manually checked routes, and available API quotas on Vercel and Supabase. Candidate comparisons include a form-based logging app, a text-only chatbot, a voice assistant without avatar output, and a GPU-hosted deployment.
+
+The 21 proposed acceptance scenarios cover coaching, weather and route queries, activity logging, food-photo correction, nutrition suggestions, lip sync, scope rejection, playback interruption, account isolation, and repeatable deployment. Human reviewers would rate the usefulness and correctness of suggestions. Automated measurements would record latency, token usage, and scope-check outcomes.
+
+Working targets are a P95 page load below 2\,s, a P95 first text response below 8\,s, a P95 audible response below 12\,s, and playback interruption below 300\,ms. Data collection is pending.
+
+% TODO: Specify trial counts, timing boundaries, rating criteria, and how
+% to test the effect of the scope and budget checks independently.
